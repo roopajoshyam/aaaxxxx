@@ -1,0 +1,1350 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "Shukran",
+    "version" : "1.6",
+    "title" : "Shukran",
+    "contact" : { }
+  },
+  "host" : "sitapi.shukran.com",
+  "basePath" : "/api",
+  "schemes" : [ "https" ],
+  "consumes" : [ "application/json" ],
+  "produces" : [ "application/json" ],
+  "security" : [ {
+    "OAuth2" : [ ]
+  } ],
+  "paths" : {
+    "/oauth/token?access" : {
+      "post" : {
+        "tags" : [ "Auth" ],
+        "summary" : "Get access token for given username and password",
+        "operationId" : "GetAccessToken",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n    \"hits\": {\n        \"token\": {\n            \"token_type\": \"string\",\n            \"expires_in\": int,\n            \"access_token\": \"string\",\n            \"refresh_token\": \"string\"\n        }\n      \"state\":\"ACCOUNT_AVAILABLE_NOT_VERIFIED, ACCOUNT_AVAILABLE_PROFILE_NOT_COMPLETED\"\n    }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/lookup/identifier" : {
+      "post" : {
+        "tags" : [ "Lookup" ],
+        "summary" : "LookUp",
+        "description" : "API to look up phone, email and card number. API responds with state and a temporary token to be used for upcoming API calls. ",
+        "operationId" : "LookUp",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n \"identifier\" : \"12313123\", \n\"type\": \"phone/email/card\", \n\"dial_code\": \"\" \n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n    \"identification_token\": \"string\",\n    \"state\": \"ACCOUNT_AVAILABLE,ACCOUNT_NOT_AVAILABLE,ACCOUNT_AVAILABLE_NOT_VERIFIED,CARD_AVAILABLE,FORCE_OTP, ACCOUNT_AVAILABLE_PROFILE_NOT_COMPLETED, SHOW_HOME\"\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Authentication failed"
+          }
+        }
+      }
+    },
+    "/otp/validate" : {
+      "post" : {
+        "tags" : [ "OTP" ],
+        "summary" : "VerifyOTP",
+        "description" : "API to verify provided OTP",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n\t\"token\": \"\",\n\t\"otp\" : 6481\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\":{\n    \"success\": true,\n    \"card_number\": \"1800000304504863\",\n    \"message\": \"Congratulations! Your account is now ready.\",\n           \"state\": \"ACCOUNT_AVAILABLE,ACCOUNT_NOT_AVAILABLE,ACCOUNT_AVAILABLE_NOT_VERIFIED,CARD_AVAILABLE,FORCE_OTP, ACCOUNT_AVAILABLE_PROFILE_NOT_COMPLETED, SHOW_HOME\",\n    \"token\": {\n        \"token_type\": \"Bearer\",\n        \"expires_in\": 12959999999,\n        \"access_token\": \"\",\n        \"refresh_token\": \"\"\n    }\n  }\n}"
+            }
+          }
+        }
+      }
+    },
+    "/otp/generate" : {
+      "post" : {
+        "tags" : [ "OTP" ],
+        "summary" : "GenerateOTP",
+        "description" : "Generate OTP for a user",
+        "operationId" : "OTPGenrate",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n\t\"token\": \"\"\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"data\":{\"success\":true,\"message\":\"Please enter the verification code we've sent to *********555 and lab***********@test.in .\"} }"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Authentication failed"
+          }
+        }
+      }
+    },
+    "/user/complete/profile" : {
+      "post" : {
+        "tags" : [ "Auth" ],
+        "summary" : "Complete profile",
+        "operationId" : "GetAccessToken",
+        "consumes" : [ ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object",
+            "properties" : {
+              "email" : {
+                "type" : "string"
+              },
+              "phone" : {
+                "type" : "string"
+              },
+              "new_password" : {
+                "type" : "string"
+              },
+              "gender" : {
+                "type" : "string"
+              },
+              "name" : {
+                "type" : "string"
+              },
+              "dial_code" : {
+                "type" : "string"
+              },
+              "dob" : {
+                "type" : "string",
+                "format" : "date"
+              },
+              "type" : {
+                "type" : "string",
+                "description" : "type should be \"email\",\"phone\" or card"
+              }
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n    \"data\": {\n        \"identification_token\": \"MjNhbG54IUC--SupGYx9WkGQuPO5XQ4KoitssCWIBcygxx7rPYKrxNuM0LH33m-d1jGdqdHOt6_5uIHmWbZjE9-JCwKsGJQvqwTiEsDbCDPYkZq18NoI79PSEoTzfudIimGbW-Ed05rf2f7KpL1Bptn9dJ0Xut48sKVq7eNaJYlBj3qiQOE_xuWezhiRSqmIud6SWwSNe36W_Jx2FfxwD8y9j9FnLRftQgVnr5oyVSamISFh0AuuWrtTetgP-D18LFTg9OLuQy-hzy_8ffMRYeA6Q22ej53xcKXKtqyg2xI\",\n        \"state\": \"SHOW_HOME,FORCE_OTP\"\n    }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/oauth/login" : {
+      "post" : {
+        "tags" : [ "Auth" ],
+        "summary" : "New login api for access token",
+        "operationId" : "GetAccessToken",
+        "consumes" : [ ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object",
+            "properties" : {
+              "username" : {
+                "type" : "string",
+                "description" : "If we are using \"phone\" or \"email\""
+              },
+              "token" : {
+                "type" : "string",
+                "description" : "It should be identification_token"
+              },
+              "password" : {
+                "type" : "string"
+              },
+              "client_id" : {
+                "type" : "string"
+              },
+              "client_secret" : {
+                "type" : "string"
+              }
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n    \"data\": {\n        \"user\": {\n            \"id\": 26,\n            \"hash\": \"pzYezQ\"\n        },\n        \"token\": {\n            \"token_type\": \"Bearer\",\n            \"expires_in\": 1295999,\n            \"access_token\": \"TSqaqMsm7KtyinivdYkWcKFNEcjvfamCGZD-Vs39-brysfqBilZXG5BKfeKPvDsyQFQbHsy5jWK1HbCbG-nwaAQwl3Aqc\",\n            \"refresh_token\": \"def502007678c31bbe03d1105f04b058f1f7cdae026af0ca3c5d84dc87ec9ae493\"\n        },\n        \"card_number\": \"1800000029537280\"\n          \"state\": \"ACCOUNT_AVAILABLE,ACCOUNT_NOT_AVAILABLE,ACCOUNT_AVAILABLE_NOT_VERIFIED,CARD_AVAILABLE,FORCE_OTP, ACCOUNT_AVAILABLE_PROFILE_NOT_COMPLETED, SHOW_HOME\"\n\n    }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/forgot/password" : {
+      "post" : {
+        "tags" : [ "Auth" ],
+        "summary" : "Forgot password",
+        "operationId" : "GetAccessToken",
+        "consumes" : [ ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object",
+            "properties" : {
+              "identifier" : {
+                "type" : "string",
+                "description" : "It should be value of email id or phone number"
+              },
+              "type" : {
+                "type" : "string",
+                "description" : "It should be \"email\" or \"phone\""
+              },
+              "dial_code" : {
+                "type" : "string",
+                "description" : "Country dial code"
+              }
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n  \"success\" : true,\n  \"message\" : \"We’ve just sent you an email with the link to reset your password. In case you can’t find it in your Inbox, please check the Spam folder.\"\n}\n"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/otp/login/generate" : {
+      "post" : {
+        "tags" : [ "OTP" ],
+        "summary" : "GenerateOTPLogin",
+        "description" : "Generate OTP for login",
+        "operationId" : "OTPLoginGenrate",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n  \"token\":\"\",\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\" : {\n  \"success\" : true,\n  \"message\" : \"Please enter the verification code we've sent to tst******@ignoremail.com .\"\n}\n}\n\n\n"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Authentication failed"
+          }
+        }
+      }
+    },
+    "/otp/login/validate" : {
+      "post" : {
+        "tags" : [ "OTP" ],
+        "summary" : "VerifyOTP for login",
+        "description" : "API to verify provided OTP",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n\t\"token\":\"\",\n\t\"otp\": 8681,\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n    \"data\": {\n        \"success\": true,\n        \"message\": \"Congratulations! Your account is now ready.\",\n        \"user\": {\n            \"id\": 26,\n            \"hash\": \"pzYezQ\"\n        },\n        \"token\": {\n            \"token_type\": \"Bearer\",\n            \"expires_in\": 1295999,\n            \"access_token\": \"\",\n            \"refresh_token\": \"\"\n        },\n        \"card_number\": \"1800000029537280\",\n        \"state\": \"ACCOUNT_AVAILABLE_PROFILE_NOT_COMPLETED\"\n    }\n}"
+            }
+          }
+        }
+      }
+    },
+    "/user/profile/ols" : {
+      "get" : {
+        "tags" : [ "Auth" ],
+        "summary" : "Get Complete Profile (One Last Step) details",
+        "operationId" : "GetAccessToken",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\":{\n    \"email\": \"program2@mailinator.com\",\n    \"phone\": \"578789890\",\n    \"country\": {\n      \"mobile_no_length\" : 9,\n      \"id\" : 1,\n      \"code\" : \"+971\",\n      \"phone_place_holder\" : \"\",\n      \"iso_code\" : \"AE\"\n    },\n    \"dob\": \"1990-11-11\",\n    \"name\": \"Naeema ali\",\n    \"gender\": \"F\",\n    \"hidden_fields\": [\n     \"password\",\n      \"gender\",\n      \"dob\",\n      \"name\" \n    ],\n    \"disabled_fields\": [\n        \"email\",\n        \"phone\n    ]\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/register" : {
+      "post" : {
+        "tags" : [ "create-account", "lookup" ],
+        "summary" : "Create Account",
+        "description" : "Create account API for new login flow. The request/response is similar to the Lookup API.\n\nNote: **type** can only be email or phone",
+        "operationId" : "CreateAccount",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n \"identifier\" : \"12313123\", \n\"type\": \"phone/email\", \n\"dial_code\": \"\" \n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n    \"identification_token\": \"string\",\n    \"state\": \"ACCOUNT_AVAILABLE,ACCOUNT_NOT_AVAILABLE,ACCOUNT_AVAILABLE_NOT_VERIFIED,CARD_AVAILABLE,FORCE_OTP, ACCOUNT_AVAILABLE_PROFILE_NOT_COMPLETED, SHOW_HOME\"\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Authentication failed"
+          }
+        }
+      }
+    },
+    "/contact_us/details" : {
+      "get" : {
+        "summary" : "Contact Us API",
+        "description" : "My Account Contact us API - Fetch",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  data: {\n    \"email\": \"info@supoort.com\",\n    \"phone\": \"+971343454555\",\n    \"timings\": [\n      {\n        \"day\": \"Sunday to Wedensday\",\n        \"time\": \"10 AM to 10 PM\"\n      },\n      {\n        \"day\": \"Thursday to Saturday\",\n        \"time\": \"10 AM to 10 PM\"\n      }\n    ]\n  }\n}"
+            }
+          }
+        }
+      }
+    },
+    "/call_us" : {
+      "get" : {
+        "summary" : "Call us API - Verify OTP",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  data: {\n    \"phone\": \"+971343454555\",\n  }\n}"
+            }
+          }
+        }
+      }
+    },
+    "/one/time/access" : {
+      "post" : {
+        "summary" : "OneTimeAccess",
+        "description" : "Get access token for CARD_AVAILABLE_NO_IDENTIFIERS state for look up",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n  \"token\":\"\",\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n    \"data\": {\n        \"user\": {\n            \"id\": 34,\n            \"hash\": \"jxWkxW\"\n        },\n        \"token\": {\n            \"token_type\": \"Bearer\",\n            \"expires_in\": 1295999,\n            \"access_token\": \"\",\n            \"refresh_token\": \"\"\n        },\n        \"card_number\": \"1800000029517401\",\n        \"state\": \"ACCOUNT_AVAILABLE_PROFILE_NOT_COMPLETED\",\n        \"message\": \"\"\n    }\n}\n\n"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Authentication failed"
+          }
+        }
+      }
+    },
+    "/verify/email" : { },
+    "/otp/verify/email" : {
+      "post" : {
+        "summary" : "Verify Email",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object",
+            "description" : "\n"
+          },
+          "x-examples" : {
+            "application/json" : "{\n\t\"token\": \"\",\n\t\"otp\" : 6481\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{  \n   \"data\":{  \n      \"success\":true,\n      \"title\":\"Successfully Verified!\",\n      \"description\":\"Great! Your email neeta@gmail.com has been verified with Shukran.\"\n   }\n}"
+            }
+          }
+        }
+      }
+    },
+    "/user/change/identifiers" : {
+      "post" : {
+        "tags" : [ "ChangeIdentifiers" ],
+        "summary" : "Change Identifiers",
+        "description" : "API to change phone and email . API responds with state and a temporary token to be used for upcoming API calls. ",
+        "operationId" : "ChangeIdentifiers",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n \"identifier\" : \"12313123\", \n\"type\": \"phone/email\", \n\"dial_code\": \"\" \n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n    \"identification_token\": \"string\",\n    \"state\": \"ACCOUNT_AVAILABLE,ACCOUNT_NOT_AVAILABLE,ACCOUNT_AVAILABLE_NOT_VERIFIED,CARD_AVAILABLE,FORCE_OTP, ACCOUNT_AVAILABLE_PROFILE_NOT_COMPLETED, SHOW_HOME\"\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Authentication failed"
+          }
+        }
+      }
+    },
+    "/user/profile" : {
+      "get" : {
+        "tags" : [ "GETProfile" ],
+        "summary" : "Get Profile",
+        "operationId" : "GETProfile",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n    \"card_no\": 1800000304684997,\n    \"preferred_language\": \"en\",\n    \"landline\": \"3454354354\",\n    \"dob\": \"2019-06-24\",\n    \"po_box\": \"345678\",\n    \"email_notification\": 1,\n    \"sms_notification\": 1,\n    \"has_programs\": true,\n    \"name\": \"Shukran\",\n    \"joined_at\": 1561334400,\n    \"push_notification\": 0,\n    \"gender\": \"M\",\n    \"email\": \"shukran41j@mailinator.com\",\n    \"tier_type\": 2,\n    \"address\": \"Address test\",\n    \"profile_url\": \"\",\n    \"phone\": \"523424343\",\n    \"phone_country\": {\n     \"name\": \"United Arab Emirates\",\n     \"mobile_no_length\": 9,\n     \"id\": 1,\n      \"flag\": \"https://get.flagurl.xn--png-9o0a\",\n      \"code\": \"+971\",\n      \"phone_place_holder\": \"\",\n      \"iso_code\": \"AE\"\n    },\n    \"preferred_country_id\" : 1,\n    \"preferred_country\" : \"United Arab Emirates\",\n    \"country\" : \"United Arab Emirates\",\n    \"country_id\" : \"1\",\n    \"nationality\" : \"India\",\n    \"nationality_id\" : 101,\n    \"city\" : \"Ajman\",\n    \"city_id\" : 29\n  }\n}"
+            }
+          }
+        }
+      }
+    },
+    "/employee/enrol" : {
+      "post" : {
+        "tags" : [ "ChangeIdentifiers" ],
+        "summary" : "Employee Enrolment",
+        "description" : "API for employee enrolmennt",
+        "operationId" : "ChangeIdentifiers",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n \"employee_token\" : \"12313123\"\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n            \"success\" => true/false,\n            \"message\" => \"Succesfully enroled the customer to employee account\",\n\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Authentication failed"
+          }
+        }
+      }
+    },
+    "/user/verify/neqaty" : {
+      "post" : {
+        "summary" : "Checks whether the given identifier is a associated with a partner",
+        "description" : "In Mobily's case, this checks if the given number is a valid Mobily number with Neqaty account.",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200"
+          }
+        }
+      }
+    },
+    "/skeleton/home" : {
+      "get" : {
+        "tags" : [ "HomeSkeleton" ],
+        "summary" : "Home Skeleton",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n  \"hits\": [\n    {\n      \"component\": \"ComponentHomeHeader\",\n      \"sub_type\": \"ComponentHomeHeader\",\n      \"data_path\": \"/api/v1/user/inboxState\",\n      \"profile_data_path\": \"/api/v1/user/profile\",\n      \"type\": \"php\",\n      \"method\": \"GET\",\n      \"timestamp\": 1518599769\n    },\n    {\n      \"component\": \"ComponentShukranDetails\",\n      \"sub_type\": \"ShukranDetails\",\n      \"data_path\": \"/api/v1/user/card\",\n      \"type\": \"php\",\n      \"method\": \"GET\",\n      \"timestamp\": 1518599769\n    },\n    {\n      \"component\": \"ComponentCarousel\",\n      \"sub_type\": \"CarouselCoupons\",\n      \"data_path\": \"/api/v1/coupons?count=5\",\n      \"type\": \"php\",\n      \"method\": \"GET\",\n      \"timestamp\": 1518566400\n    },\n    {\n      \"component\": \"ComponentCarousel\",\n      \"sub_type\": \"CarouselRecommenededOffers\",\n      \"data_path\": \"/api/v1/offers/recommended\",\n      \"type\": \"php\",\n      \"method\": \"POST\",\n      \"payload\": {\n        \"params\": \"hitsPerPage=5\"\n      },\n      \"timestamp\": 1518652800\n    },\n    {\n      \"component\": \"ComponentCarousel\",\n      \"sub_type\": \"CarouselPartnerOffers\",\n      \"data_path\": \"http://txg1tanxsp-dsn.algolia.net/1/indexes/offers_en/query\",\n      \"type\": \"algolia\",\n      \"method\": \"POST\",\n      \"payload\": {\n        \"params\": \"hitsPerPage=5&query=\"\n      },\n      \"timestamp\": 1518739200\n    },\n    {\n      \"component\": \"ComponentCarousel\",\n      \"sub_type\": \"CarouselWhatsNew\",\n      \"data_path\": \"http://txg1tanxsp-dsn.algolia.net/1/indexes/news_en/query\",\n      \"type\": \"algolia\",\n      \"method\": \"POST\",\n      \"payload\": {\n        \"params\": \"hitsPerPage=5&query=\"\n      },\n      \"timestamp\": 1518825600\n    },\n    {\n      \"component\": \"ComponentList\",\n      \"sub_type\": \"ListUpComingEvents\",\n      \"data_path\": \"http://txg1tanxsp-dsn.algolia.net/1/indexes/events_en/query\",\n      \"type\": \"algolia\",\n      \"method\": \"POST\",\n      \"payload\": {\n        \"params\": \"hitsPerPage=5&query=\"\n      },\n      \"timestamp\": 1518599769\n    },\n    {\n      \"component\": \"ComponentCarousel\",\n      \"sub_type\": \"CarouselHighlightedPromotions\",\n      \"data_path\": \"/api/v1/promotions\",\n      \"type\": \"php\",\n      \"method\": \"GET\",\n      \"payload\": {\n        \"params\": \"hitsPerPage=5&query=\"\n      },\n      \"timestamp\": 1518599769\n    }\n  ]\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/promotions" : {
+      "get" : {
+        "tags" : [ "Promotions" ],
+        "summary" : "Get Promotions",
+        "description" : "API to get promotions ",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n  \"hits\": [\n    {\n      \"id\": 1,\n      \"title\": \"10 x more shukran in your meals\",\n      \"click_path\": \"/api/v1/offers/\",\n      \"timestamp\": 1488326400,\n      \"navigation_path\": \"app:offer_details\",\n      \"image\": \"https://i.imgur.com/w0L2r6J.png\",\n      \"slug\" : \"offer-name\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"10 x more shukran in your meals\",\n      \"click_path\": \"/api/v1/promotion/\",\n      \"timestamp\": 1488326400,\n      \"navigation_path\": \"app:promotion_details\",\n      \"image\": \"https://i.imgur.com/w0L2r6J.png\",\n      \"slug\" : \"promotion-name\"\n    }\n  ]\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/promotion/{id}" : {
+      "get" : {
+        "tags" : [ "Promotions" ],
+        "summary" : "Get Promotion Details",
+        "description" : "API to get promotion details  ",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": [\n    {\n      \"component\": \"ComponentHeader\",\n      \"sub_type\": \"ComponentHeader\",\n      \"data_path\": \"\",\n      \"data\": {\n        \"image\": \"http://sitcms.shukranrewards.com/storage/86/Gold_Jewllery.png\",\n        \"header_type\": \"image\",\n        \"video_url\": \"\"\n      },\n      \"timestamp\": 1520935402\n    },\n    {\n      \"component\": \"ComponentTitleHeader\",\n      \"sub_type\": \"ComponentTitleHeader\",\n      \"data_path\": \"\",\n      \"data\": {\n        \"logo\": \"http://sitcms.shukranrewards.com/storage/85/Kalyanjewellerslogo.jpg\",\n        \"tag\": \"Partner\",\n        \"valid_from\": \"\",\n        \"valid_to\": \"\"\n      },\n      \"timestamp\": 1520935402\n    },\n    {\n      \"component\": \"ComponentDetailsHTMLContent\",\n      \"sub_type\": \"ComponentDetailsHTMLContent\",\n      \"data_path\": \"\",\n      \"data\": {\n        \"description\": \"Kalyan Jewellers is an Indian jewellery store chain owned by the Kalyan Group.[1] It was founded by T. S. Kalyanaraman, who started the first jewellery shop in 1993 in Thrissur, Kerala, India (the company's current headquarters) with a capital of ₹7.5 million (US$110,000) and has since grown to become the largest jewellery store chain in India\"\n      },\n      \"timestamp\": 1520935402\n    },\n    {\n            \"component\": \"ComponentLoyalityConverter\",\n            \"sub_type\": \"ComponentLoyalityConverter\",\n            \"data_path\": \"coalition/detail/component/mobily?button_action=app%3Ainput_screen&button_label=Convert+now&brand_code=mobily\",\n            \"type\": \"php\",\n            \"method\": \"GET\",\n            \"timestamp\": 1564999991\n        },\n        {\n            \"component\": \"ComponentTextIcon\",\n            \"sub_type\": \"TextIconFAQ\",\n            \"data_path\": \"\",\n            \"data\": {\n                \"text\": \"FAQs\",\n                \"click_path\": \"pages/faq/brand/15\"\n            },\n            \"timestamp\": 1564999991\n        },\n        {\n            \"component\": \"ComponentTextIcon\",\n            \"sub_type\": \"TextIconTermsAndConditions\",\n            \"data_path\": \"\",\n            \"data\": {\n                \"text\": \"Terms & conditions\",\n                \"click_path\": \"pages/terms/brand/15\"\n            },\n            \"timestamp\": 1564999991\n        }\n  ],\n  \"id\": 5,\n  \"Is_partner\": \"true\"\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    },
+    "/coalition/details/mobily" : {
+      "get" : {
+        "tags" : [ "Promotions" ],
+        "summary" : "Get Nequaty Data",
+        "description" : "API to get neqaty details for prefilling the screen",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n    \"mobile_number\": \"98765432\",\n    \"title\": \"Shukrans to Neqaty\",\n    \"logo\":\"/local_r/3/bccvv cvcQae.png\",\n    \"sub_title\": \"Please, enter your Mobily number to transfer Shukrans.\",\n\"click_path\" : \"coalition/verify/mobily\",\n   \"phone_country\": {\n                    \"id\": 4,\n                    \"iso_code\": \"AE\",\n                    \"code\": \"+971\",\n                    \"phone_place_holder\": \"56878789\",\n                    \"flag\": \"/local_r/3/bccQae.png\",\n                    \"phone_number_limit\": 9\n                }\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/coalition/verify/mobily" : {
+      "post" : {
+        "tags" : [ "Promotions" ],
+        "summary" : "Verify Neqaty Number",
+        "description" : "API to validate the number entered by user for Neqaty",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n  \"identifier\":\"565464566456\",\n  \"dial_code\":\"+966\",\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n    \"success\":true,\n    \"identification_token\": \"MjNhbG54IUCn2tv16GuVlw_ExMD1jT11c-VyjdPpmZtQwPx6ZDOse55WTt_6-tVvodO0jJpd4gWIvEmKA9VM9g\"\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/coalition/choose/mobily" : {
+      "get" : {
+        "tags" : [ "Promotions" ],
+        "summary" : "Get Conversation  Components",
+        "description" : "API to get convertion components",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "identification-token",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "x-example" : "MjNhbG54IUCn2tv16GuVlw_ExMD1jT11c-VyjdPpmZtQwPx6ZDOse55WTt_6-tVvodO0jJpd4gWIvEmKA9VM9g"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n    \"data\": [\n        {\n            \"component\": \"ComponentLoyaltyDetails\",\n            \"sub_type\": \"ComponentLoyaltyDetails\",\n            \"data_path\": \"\",\n            \"data\": {\n                \"title\": \"Mobily\",\n                \"identification_token\": \"MjNhbG54IUAvmHMoAu4-eb_L7fIkR6CElh5f6fmOpPwNm-c1iyNjarM0FPDs2KsvBRMni4WPIAf8rBwcLQNHHQ\",\n                \"identifier\": \"512345678\",\n                \"phone_country\": {\n                    \"id\": 1,\n                    \"iso_code\": \"SA\",\n                    \"code\": \"+966\",\n                    \"phone_place_holder\": \"500 12345\",\n                    \"flag\": \"/local_r/1/mobile-number-country-code-length-1565168041.png\",\n                    \"phone_number_limit\": 9\n                }\n            },\n            \"timestamp\": 1565938489\n        },\n        {\n            \"component\": \"ComponentLoyaltyConversion\",\n            \"sub_type\": \"ComponentLoyaltyConversion\",\n            \"data_path\": \"\",\n            \"data\": {\n                \"total_shukrans\": 0,\n                \"divisible_value\": 1200,\n                \"conversion_value\": 0.6958,\n                \"math_action\": \"div\",\n                \"conversion_text\": \"Neqaty\",\n                \"action_path\": \"coalition/convert/mobily\",\n                \"identification_token\": \"MjNhbG54IUAvmHMoAu4-eb_L7fIkR6CElh5f6fmOpPwNm-c1iyNjarM0FPDs2KsvBRMni4WPIAf8rBwcLQNHHQ\"\n            },\n            \"timestamp\": 1565938489\n        }\n    ]\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/coalition/convert/mobily" : {
+      "post" : {
+        "tags" : [ "Promotions" ],
+        "summary" : "Convert Points",
+        "description" : "API to convert chosen points to coalation values ",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "identification-token",
+          "in" : "header",
+          "required" : false,
+          "type" : "string",
+          "x-example" : "MjNhbG54IUAvmHMoAu4-eb_L7fIkR6CElh5f6fmOpPwNm-c1iyNjarM0FPDs2KsvBRMni4WPIAf8rBwcLQNHHQ"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n  \"chosen_points\":\"3600\"\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n    \"success\": \"true/false\",\n    \"title\": \"Transfer Successful\",\n    \"description\": \"Great! You’ve successfully transfered your Shukrans to Neqaty. You can find transaction details in Receipts & Transtactions.\"\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/coalition/detail/component/mobily?button_action=app%3Ainput_screen&button_label=Convert+now&brand_code=mobily" : {
+      "get" : {
+        "tags" : [ "Promotions" ],
+        "summary" : "Get Promotion Detail component data",
+        "description" : "API to get promotion details  component data",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object",
+              "description" : "Response "
+            },
+            "examples" : {
+              "application/json" : "{\n    \"data\": {\n        \"state\": \"Inline\",\n        \"title\": \"Shukrans to Neqaty\",\n        \"sub_title\": \"Please, enter your Mobily number to transfer Shukrans.\",\n        \"button_label\": \"Convert now\",\n        \"conversion_info\": \"You can convert minimum 1200 Shukrans.\",\n        \"button_enabled\": true,\n        \"click_path\": \"coalition/verify/mobily\",\n        \"identifier\": \"56534452\",\n        \"phone_country\": {\n            \"id\": 5,\n            \"iso_code\": \"SA\",\n            \"code\": \"+966\",\n            \"phone_place_holder\": \"\",\n            \"flag\": \"/local_r/4/UxY4sa.png\",\n            \"phone_number_limit\": 9\n        }\n    }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Please provide password.\"}"
+            }
+          },
+          "401" : {
+            "description" : "Authentication failed",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Invalid API key.\"}"
+            }
+          },
+          "403" : {
+            "description" : "Status 403",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"API key is missing.\"}"
+            }
+          },
+          "500" : {
+            "description" : "Status 500",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\"error\":\"Something went wrong. Please try again later.\"}"
+            }
+          }
+        }
+      }
+    },
+    "/sign-up" : {
+      "post" : {
+        "tags" : [ "SignUp" ],
+        "summary" : "Sign-Up",
+        "description" : "API to register Phone and email, validate phone with otp.",
+        "operationId" : "SignUp",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "type" : "object"
+          },
+          "x-examples" : {
+            "application/json" : "{\n\"email\":\"aaru@mailinator.com\",\n\"type\":\"phone\",\n\"dial_code\":\"+973\",\n\"phone\":\"67812396\",\n\"name\":\"aaru\"\n\"password\":\"landmark2019\"\n}"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful Request",
+            "schema" : {
+              "type" : "object"
+            },
+            "examples" : {
+              "application/json" : "{\n  \"data\": {\n    \"identification_token\": \"string\",\n    \"state\": \"FORCE_OTP\"\n  }\n}"
+            }
+          },
+          "400" : {
+            "description" : "Invalid Request"
+          },
+          "401" : {
+            "description" : "Authentication failed"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "OAuth2" : {
+      "type" : "oauth2",
+      "tokenUrl" : "",
+      "flow" : "password",
+      "scopes" : { }
+    }
+  }
+}
